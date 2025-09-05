@@ -35,6 +35,10 @@ git clone https://github.com/LLMServe/SwiftTransformer.git && cd SwiftTransforme
 pip install -e .
 ```
 
+## Artifact Evaluation
+
+See [benchmarks/artifact-evaluation/README.md](./benchmarks/artifact-evaluation/README.md) for detailed instructions.
+
 ## Run
 
 ### Offline case
