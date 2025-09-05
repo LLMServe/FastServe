@@ -183,3 +183,54 @@ python benchmarks/benchmark-serving/benchmark-serving.py \
         --process-name possion \
         --dataset-name sharegpt
 ```
+
+### Figure 15
+```
+# FastServe-FCFS backend
+conda activate fastserve $$ cd FastServe
+python3 fastserve/api_server/fastserve_api_server.py --host 0.0.0.0 --port 8000 --model ~/research/weights/Llama3-8b-CunnyGPT-16bit-swifttransformer/ --block-size 16 --gpu-memory-utilization 0.9 --swap-space 32 --sched-policy fcfs --max-batch-size 16 --max-tokens-per-batch 2048 --use-dummy-weights
+
+# FastGen-FCFS frontend
+conda activate fastserve $$ cd FastServe
+python benchmarks/benchmark-serving/benchmark-serving.py \
+        --port 10000 \
+        --backend fastserve \
+        --tokenizer ~/research/weights/Llama3-8b-CunnyGPT-16bit-swifttransformer/ \
+        --dataset /users/zzl/datasets/ShareGPT_V3_unfiltered_cleaned_split.json \
+        --num-prompts 1000 \
+        --request-rate 1 \
+        --process-name possion \
+        --dataset-name sharegpt
+
+# vLLM backend
+conda activate fastserve-rr-vllm
+python -m vllm.entrypoints.api_server --host 0.0.0.0 --port 9000 --model ~/research/weights/Llama3-8b-CunnyGPT-16bit/ --load-format dummy --dtype float16 --block-size 16 --gpu-memory-utilization 0.9 --max-num-batched-tokens 2048 --max-model-len 2048 --max-num-seqs 16 --enforce-eager --disable-custom-all-reduce --device cuda --num-scheduler-steps 1 --swap-space 32 --disable-log-requests
+
+# vllm frontend
+conda activate fastserve $$ cd FastServe
+python benchmarks/benchmark-serving/benchmark-serving.py \
+        --port 7845 \
+        --backend vllm \
+        --tokenizer ~/research/weights/Llama3-8b-CunnyGPT-16bit/ \
+        --dataset /users/zzl/datasets/ShareGPT_V3_unfiltered_cleaned_split.json \
+        --num-prompts 1000 \
+        --request-rate 1 \
+        --process-name possion \
+        --dataset-name sharegpt
+
+# FastGen backend
+conda activate fastserve $$ cd FastServe
+python3 fastserve/api_server/fastserve_api_server.py --host 0.0.0.0 --port 10000 --model ~/research/weights/Llama3-8b-CunnyGPT-16bit-swifttransformer/ --block-size 16 --gpu-memory-utilization 0.9 --swap-space 32 --sched-policy sj-mlfq --max-batch-size 16 --max-tokens-per-batch 2048 --use-dummy-weights --proactive-offloading --use-skip-join --profiling-file ./profiling-model
+
+# FastGen frontend
+conda activate fastserve $$ cd FastServe
+python benchmarks/benchmark-serving/benchmark-serving.py \
+        --port 10000 \
+        --backend fastserve \
+        --tokenizer ~/research/weights/Llama3-8b-CunnyGPT-16bit-swifttransformer/ \
+        --dataset ~/datasets/ShareGPT_V3_unfiltered_cleaned_split.json \
+        --num-prompts 1000 \
+        --request-rate 1 \
+        --process-name possion \
+        --dataset-name sharegpt
+```
