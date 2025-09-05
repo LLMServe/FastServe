@@ -7,7 +7,7 @@ After you `ssh` into machine (e.g., xinjin1), run the following command to activ
 source ~/.bashrc
 ```
 
-### Figure 11 & Figure 12
+### Figure 11 & Figure 12 & Figure 18
 ```
 # FastGen backend
 conda activate fastserve $$ cd FastServe
@@ -105,8 +105,8 @@ python -m vllm.entrypoints.api_server \
 # vllm frontend
 conda activate fastserve $$ cd FastServe
 # Define the lists of parameters as shell arrays
-num_prompt_list=(20 50 100 200 300 350 400 400 400 400 400)
-rate_list=(0.1 0.2 0.5 1 1.5 1.75 2 2.25 2.5 3 4)
+num_prompt_list=(20 50 100 200 300 350 400 400 400 400 400 400 400	400)
+rate_list=(0.1 0.2 0.5 1 1.5 1.75 2 2.25 2.5 3 4 4.5 5 5.5)
 # Get the total number of elements in the array
 num_tests=${#rate_list[@]}
 # Loop from 0 to the number of tests - 1
@@ -159,8 +159,8 @@ python -m vllm.entrypoints.api_server \
 # vllm frontend with chunked-prefill
 conda activate fastserve $$ cd FastServe
 # Define the lists of parameters as shell arrays
-num_prompt_list=(20 50 100 200 300 350 400 400 400 400 400)
-rate_list=(0.1 0.2 0.5 1 1.5 1.75 2 2.25 2.5 3 4)
+num_prompt_list=(20 50 100 200 300 350 400 400 400 400 400 400 400	400)
+rate_list=(0.1 0.2 0.5 1 1.5 1.75 2 2.25 2.5 3 4 4.5 5 5.5)
 # Get the total number of elements in the array
 num_tests=${#rate_list[@]}
 # Loop from 0 to the number of tests - 1
