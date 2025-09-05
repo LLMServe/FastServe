@@ -195,13 +195,30 @@ python3 fastserve/api_server/fastserve_api_server.py --host 0.0.0.0 --port 10000
 
 # FastGen frontend
 conda activate fastserve $$ cd FastServe
-python benchmarks/benchmark-serving/benchmark-serving.py \
+# Define the lists of parameters as shell arrays
+num_prompt_list=(200 400 500 550 600 650 700 750)
+rate_list=(1 2 2.5 2.75 3 3.25 3.5 3.75)
+# Get the total number of elements in the array
+num_tests=${#rate_list[@]}
+# Loop from 0 to the number of tests - 1
+for (( i=0; i<num_tests; i++ )); do
+    # Get the parameters for the current run
+    num_prompt=${num_prompt_list[i]}
+    rate=${rate_list[i]}
+
+    # Print a message indicating which test is running
+    echo "======================================================================"
+    echo "Running Test $((i+1))/$num_tests: Rate = $rate, Num Prompts = $num_prompt"
+    echo "======================================================================"
+
+    # Execute the benchmark command with the current parameters
+    python benchmarks/benchmark-serving/benchmark-serving.py \
         --port 10000 \
         --backend fastserve \
         --tokenizer /users/wby/weights/opt-13b-swtransformer \
         --dataset ~/datasets/ShareGPT_V3_unfiltered_cleaned_split.json \
-        --num-prompts 1000 \
-        --request-rate 1 \
+        --num-prompts "$num_prompt" \
+        --request-rate "$rate" \
         --process-name possion \
         --dataset-name sharegpt
 
@@ -212,13 +229,30 @@ python3 fastserve/api_server/fastserve_api_server.py --host 0.0.0.0 --port 10000
 
 # FastGen-FCFS frontend
 conda activate fastserve $$ cd FastServe
-python benchmarks/benchmark-serving/benchmark-serving.py \
+# Define the lists of parameters as shell arrays
+num_prompt_list=(200 400 500 550 600 650 700 750)
+rate_list=(1 2 2.5 2.75 3 3.25 3.5 3.75)
+# Get the total number of elements in the array
+num_tests=${#rate_list[@]}
+# Loop from 0 to the number of tests - 1
+for (( i=0; i<num_tests; i++ )); do
+    # Get the parameters for the current run
+    num_prompt=${num_prompt_list[i]}
+    rate=${rate_list[i]}
+
+    # Print a message indicating which test is running
+    echo "======================================================================"
+    echo "Running Test $((i+1))/$num_tests: Rate = $rate, Num Prompts = $num_prompt"
+    echo "======================================================================"
+
+    # Execute the benchmark command with the current parameters
+    python benchmarks/benchmark-serving/benchmark-serving.py \
         --port 10000 \
         --backend fastserve \
         --tokenizer /users/wby/weights/opt-13b-swtransformer \
         --dataset /users/zzl/datasets/ShareGPT_V3_unfiltered_cleaned_split.json \
-        --num-prompts 1000 \
-        --request-rate 1 \
+        --num-prompts "$num_prompt" \
+        --request-rate "$rate" \
         --process-name possion \
         --dataset-name sharegpt
 
@@ -244,14 +278,31 @@ python -m vllm.entrypoints.api_server \
        --num-gpu-blocks-override 400 \
 
 # vllm frontend
-conda activate fastserve $$ cd FastServe
-python benchmarks/benchmark-serving/benchmark-serving.py \
+conda activate fastserve-rr-vllm
+# Define the lists of parameters as shell arrays
+num_prompt_list=(200 400 500 550 600 650 700 750)
+rate_list=(1 2 2.5 2.75 3 3.25 3.5 3.75)
+# Get the total number of elements in the array
+num_tests=${#rate_list[@]}
+# Loop from 0 to the number of tests - 1
+for (( i=0; i<num_tests; i++ )); do
+    # Get the parameters for the current run
+    num_prompt=${num_prompt_list[i]}
+    rate=${rate_list[i]}
+
+    # Print a message indicating which test is running
+    echo "======================================================================"
+    echo "Running Test $((i+1))/$num_tests: Rate = $rate, Num Prompts = $num_prompt"
+    echo "======================================================================"
+
+    # Execute the benchmark command with the current parameters
+    python benchmarks/benchmark-serving/benchmark-serving.py \
         --port 7845 \
         --backend vllm \
         --tokenizer /users/wby/weights/opt-13b \
         --dataset /users/zzl/datasets/ShareGPT_V3_unfiltered_cleaned_split.json \
-        --num-prompts 1000 \
-        --request-rate 1 \
+        --num-prompts "$num_prompt" \
+        --request-rate "$rate" \
         --process-name possion \
         --dataset-name sharegpt
 ```
