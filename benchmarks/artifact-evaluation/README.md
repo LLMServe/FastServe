@@ -15,15 +15,33 @@ python3 fastserve/api_server/fastserve_api_server.py --host 0.0.0.0 --port 10000
 
 # FastGen frontend
 conda activate fastserve $$ cd FastServe
-python benchmarks/benchmark-serving/benchmark-serving.py \
+# Define the lists of parameters as shell arrays
+num_prompt_list=(20 50 100 200 300 350 400 400 400 400 400 400 400 400 400 400)
+rate_list=(0.1 0.2 0.5 1 1.5 1.75 2 2.25 2.5 3 4 4.5 5 5.5 6 10)
+# Get the total number of elements in the array
+num_tests=${#rate_list[@]}
+# Loop from 0 to the number of tests - 1
+for (( i=0; i<num_tests; i++ )); do
+    # Get the parameters for the current run
+    num_prompt=${num_prompt_list[i]}
+    rate=${rate_list[i]}
+
+    # Print a message indicating which test is running
+    echo "======================================================================"
+    echo "Running Test $((i+1))/$num_tests: Rate = $rate, Num Prompts = $num_prompt"
+    echo "======================================================================"
+
+    # Execute the benchmark command with the current parameters
+    python benchmarks/benchmark-serving/benchmark-serving.py \
         --port 10000 \
         --backend fastserve \
         --tokenizer /users/wby/weights/opt-13b-swtransformer \
         --dataset /users/zzl/datasets/ShareGPT_V3_unfiltered_cleaned_split.json \
-        --num-prompts 400 \
-        --request-rate 2.5 \
+        --num-prompts "$num_prompt" \
+        --request-rate "$rate" \
         --process-name possion \
         --dataset-name sharegpt
+done
 ```
 
 ```
@@ -33,15 +51,33 @@ python3 fastserve/api_server/fastserve_api_server.py --host 0.0.0.0 --port 10000
 
 # FastGen-FCFS frontend
 conda activate fastserve $$ cd FastServe
-python benchmarks/benchmark-serving/benchmark-serving.py \
+# Define the lists of parameters as shell arrays
+num_prompt_list=(20 50 100 200 300 350 400 400 400 400 400)
+rate_list=(0.1 0.2 0.5 1 1.5 1.75 2 2.25 2.5 3 4)
+# Get the total number of elements in the array
+num_tests=${#rate_list[@]}
+# Loop from 0 to the number of tests - 1
+for (( i=0; i<num_tests; i++ )); do
+    # Get the parameters for the current run
+    num_prompt=${num_prompt_list[i]}
+    rate=${rate_list[i]}
+
+    # Print a message indicating which test is running
+    echo "======================================================================"
+    echo "Running Test $((i+1))/$num_tests: Rate = $rate, Num Prompts = $num_prompt"
+    echo "======================================================================"
+
+    # Execute the benchmark command with the current parameters
+    python benchmarks/benchmark-serving/benchmark-serving.py \
         --port 10000 \
         --backend fastserve \
         --tokenizer /users/wby/weights/opt-13b-swtransformer \
         --dataset /users/zzl/datasets/ShareGPT_V3_unfiltered_cleaned_split.json \
-        --num-prompts 400 \
-        --request-rate 2.5 \
+        --num-prompts "$num_prompt" \
+        --request-rate "$rate" \
         --process-name possion \
         --dataset-name sharegpt
+done
 ```
 
 ```
@@ -68,15 +104,33 @@ python -m vllm.entrypoints.api_server \
 
 # vllm frontend
 conda activate fastserve $$ cd FastServe
-python benchmarks/benchmark-serving/benchmark-serving.py \
+# Define the lists of parameters as shell arrays
+num_prompt_list=(20 50 100 200 300 350 400 400 400 400 400)
+rate_list=(0.1 0.2 0.5 1 1.5 1.75 2 2.25 2.5 3 4)
+# Get the total number of elements in the array
+num_tests=${#rate_list[@]}
+# Loop from 0 to the number of tests - 1
+for (( i=0; i<num_tests; i++ )); do
+    # Get the parameters for the current run
+    num_prompt=${num_prompt_list[i]}
+    rate=${rate_list[i]}
+
+    # Print a message indicating which test is running
+    echo "======================================================================"
+    echo "Running Test $((i+1))/$num_tests: Rate = $rate, Num Prompts = $num_prompt"
+    echo "======================================================================"
+
+    # Execute the benchmark command with the current parameters
+    python benchmarks/benchmark-serving/benchmark-serving.py \
         --port 7845 \
         --backend vllm \
         --tokenizer /users/wby/weights/opt-13b \
         --dataset /users/zzl/datasets/ShareGPT_V3_unfiltered_cleaned_split.json \
-        --num-prompts 400 \
-        --request-rate 2.5 \
+        --num-prompts "$num_prompt" \
+        --request-rate "$rate" \
         --process-name possion \
         --dataset-name sharegpt
+done
 ```
 
 ```
@@ -104,15 +158,33 @@ python -m vllm.entrypoints.api_server \
 
 # vllm frontend with chunked-prefill
 conda activate fastserve $$ cd FastServe
-python benchmarks/benchmark-serving/benchmark-serving.py \
+# Define the lists of parameters as shell arrays
+num_prompt_list=(20 50 100 200 300 350 400 400 400 400 400)
+rate_list=(0.1 0.2 0.5 1 1.5 1.75 2 2.25 2.5 3 4)
+# Get the total number of elements in the array
+num_tests=${#rate_list[@]}
+# Loop from 0 to the number of tests - 1
+for (( i=0; i<num_tests; i++ )); do
+    # Get the parameters for the current run
+    num_prompt=${num_prompt_list[i]}
+    rate=${rate_list[i]}
+
+    # Print a message indicating which test is running
+    echo "======================================================================"
+    echo "Running Test $((i+1))/$num_tests: Rate = $rate, Num Prompts = $num_prompt"
+    echo "======================================================================"
+
+    # Execute the benchmark command with the current parameters
+    python benchmarks/benchmark-serving/benchmark-serving.py \
         --port 7845 \
         --backend vllm \
         --tokenizer /users/wby/weights/opt-13b \
         --dataset /users/zzl/datasets/ShareGPT_V3_unfiltered_cleaned_split.json \
-        --num-prompts 400 \
-        --request-rate 2.5 \
+        --num-prompts "$num_prompt" \
+        --request-rate "$rate" \
         --process-name possion \
         --dataset-name sharegpt
+done
 ```
 
 ### Figure 14
