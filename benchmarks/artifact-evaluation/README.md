@@ -408,3 +408,6 @@ for (( i=0; i<num_tests; i++ )); do
         --process-name possion \
         --dataset-name sharegpt
 ```
+
+## Visualization
+The plotting code is in [plot.ipynb](./plot.ipynb). You can run it in a Jupyter notebook environment. If you want to use your own evaluation results, please modify it according to the comments in the notebook.
