@@ -285,7 +285,7 @@ async def benchmark(
                 "top_p": 1.0,
                 "max_tokens": output_len,
                 "ignore_eos": True,
-                "stream": False,
+                "stream": True,
             }
         elif backend == "tgi":
             assert not use_beam_search
@@ -304,46 +304,57 @@ async def benchmark(
         # print(f"Sending the request: {pload}")
         global sent_pbar, finish_pbar, last_print_time, last_print_num_outputs
         timeout = aiohttp.ClientTimeout(total=3 * 3600)
+        first_token_time = 0
         async with aiohttp.ClientSession(timeout=timeout) as session:
             sent_pbar.update(1)
             sent_pbar.refresh()
-            async with session.post(api_url, headers=headers, json=pload) as response:
-                chunks = []
-                async for chunk, _ in response.content.iter_chunks():
-                    chunks.append(chunk)
-            output = b"".join(chunks).decode("utf-8")
-            output = json.loads(output)
+            error_req = False
+            try:
+                async with session.post(api_url, headers=headers, json=pload) as response:
+                    chunks = []
+                    # async for chunk, _ in response.content.iter_chunks():
+                    async for chunk in response.content.iter_any():
+                        if first_token_time == 0:
+                            first_token_time = time.time()
+                        chunks.append(chunk)
+                # output = b"".join(chunks).decode("utf-8")
+                # output = json.loads(output)
+            except Exception as e:
+                error_req = True
+                print(f"Failed to parse the response, error: {e}")
 
             # if output['text'][:len(prompt)] != prompt:
             #     print('(Prompt mismatch)', prompt.__repr__(), output['text'].__repr__())
             # else:
             #     print(prompt.__repr__(), output['text'][len(prompt):].__repr__())
 
-            # Re-send the request if it failed.
-            if "error" in output:
-                print(f"Failed to process the request: {output['error']}, request: {pload}")
-                assert False
+            if not error_req:
 
-            request_end_time = time.time()
-            request_latency = request_end_time - request_start_time
-            REQUEST_LATENCY.append((prompt_len, output_len, request_latency, request_start_time, request_end_time))
+                # Re-send the request if it failed.
+                # if "error" in output:
+                #     print(f"Failed to process the request: {output['error']}, request: {pload}")
+                #     assert False
 
-            finish_pbar.update(1)
-            finish_pbar.refresh()
+                request_end_time = time.time()
+                request_latency = request_end_time - request_start_time
+                REQUEST_LATENCY.append((prompt_len, output_len, request_latency, request_start_time, request_end_time, first_token_time))
 
-            if len(REQUEST_LATENCY)-last_print_num_outputs > len(input_requests)*0.1 or \
-                time.time() - last_print_time > 30:
-                if last_print_time != 0:
-                    print("\n\n")
-                    print(f"{sent_pbar.n} requests sent, {len(REQUEST_LATENCY)} requests finished.")
-                    print(f"Gap: {sent_pbar.n-finish_pbar.n} / {sent_pbar.n} ({(sent_pbar.n-finish_pbar.n)/sent_pbar.n*100:.2f}%)")
-                    print("")
-                    sys.stdout.flush()
-                
-                sent_pbar.refresh()
+                finish_pbar.update(1)
                 finish_pbar.refresh()
-                last_print_time = time.time()
-                last_print_num_outputs = len(REQUEST_LATENCY)
+
+                if len(REQUEST_LATENCY)-last_print_num_outputs > len(input_requests)*0.1 or \
+                    time.time() - last_print_time > 30:
+                    if last_print_time != 0:
+                        print("\n\n")
+                        print(f"{sent_pbar.n} requests sent, {len(REQUEST_LATENCY)} requests finished.")
+                        print(f"Gap: {sent_pbar.n-finish_pbar.n} / {sent_pbar.n} ({(sent_pbar.n-finish_pbar.n)/sent_pbar.n*100:.2f}%)")
+                        print("")
+                        sys.stdout.flush()
+                    
+                    sent_pbar.refresh()
+                    finish_pbar.refresh()
+                    last_print_time = time.time()
+                    last_print_num_outputs = len(REQUEST_LATENCY)
 
     tasks: List[asyncio.Task] = []
     async for request in get_request(
@@ -403,8 +414,8 @@ def main(args: argparse.Namespace):
     # for i in REQUEST_LATENCY:
     #     print(i)
     # Compute the latency statistics.
-    avg_latency = np.mean([latency for _, _, latency, _, _ in REQUEST_LATENCY])
-    p95_latency = np.percentile([latency for _, _, latency, _, _ in REQUEST_LATENCY], 95)
+    avg_latency = np.mean([latency for _, _, latency, _, _, _ in REQUEST_LATENCY])
+    p95_latency = np.percentile([latency for _, _, latency, _, _, _ in REQUEST_LATENCY], 95)
     print(f"Average latency: {avg_latency:.2f} s")
     print(f"95th percentile latency: {p95_latency:.2f} s")
 
@@ -412,12 +423,12 @@ def main(args: argparse.Namespace):
     avg_per_token_latency = np.mean(
         [
             latency / (prompt_len + output_len)
-            for prompt_len, output_len, latency, _, _ in REQUEST_LATENCY
+            for prompt_len, output_len, latency, _, _, _ in REQUEST_LATENCY
         ]
     )
     print(f"Average latency per token: {avg_per_token_latency:.5f} s")
     avg_per_output_token_latency = np.mean(
-        [latency / output_len for _, output_len, latency, _, _ in REQUEST_LATENCY]
+        [latency / output_len for _, output_len, latency, _, _, _ in REQUEST_LATENCY]
     )
     print("Average latency per output token: " f"{avg_per_output_token_latency:.3f} s")
 
