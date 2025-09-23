@@ -58,7 +58,7 @@ for (( i=0; i<num_tests; i++ )); do
         --max-model-len 2048 --max-num-seqs 16 \
         --enforce-eager --disable-custom-all-reduce \
         --device cuda --num-scheduler-steps 1 \
-        --disable-log-requests --num-gpu-blocks-override 400 \
+        --disable-log-requests \
         --enable-chunked-prefill &
 
     # Store the Process ID (PID) of the background process.

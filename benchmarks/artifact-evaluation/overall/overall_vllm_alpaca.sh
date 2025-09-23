@@ -10,7 +10,7 @@ conda activate fastserve-rr-vllm
 # --- 2. Define Backend and Frontend Parameters ---
 # Backend (vLLM) specific parameters
 BACKEND_HOST="0.0.0.0"
-BACKEND_PORT="7845"
+BACKEND_PORT="10076"
 MODEL_PATH="/users/zzl/models/opt-13b"
 TOKENIZER_PATH="/users/wby/weights/opt-13b" # Note: Adjusted to match your frontend command
 DATASET_PATH="/users/zzl/datasets/alpaca_data.json"
@@ -56,7 +56,7 @@ for (( i=0; i<num_tests; i++ )); do
         --max-model-len 2048 --max-num-seqs 16 \
         --enforce-eager --disable-custom-all-reduce \
         --device cuda --num-scheduler-steps 1 \
-        --disable-log-requests --num-gpu-blocks-override 400 &
+        --disable-log-requests &
 
     # Store the Process ID (PID) of the background process.
     BACKEND_PID=$!
