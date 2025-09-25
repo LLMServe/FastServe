@@ -10,6 +10,8 @@ source ~/.bashrc
 ### Figure 11 & Figure 12 & Figure 13 & Figure 18
 First, navigate into the `overall` directory which contains the necessary shell scripts. Next, execute all the `overall_*.sh` scripts to run the experiments. These scripts will generate the log data required for the figures. (Note: You can modify the output directory variable inside each `.sh` script to specify where you want to save the log files.) Once all the benchmark scripts have successfully completed, run the `fig*.py` Python scripts to process the logs and generate the final figures. (Note: Ensure the log directory path in the Python scripts matches the location where the benchmark logs were saved.)
 
+For sharegpt dataset, each script may consume 3-5 hours. For alpaca, each script may consume 1-3 hours.
+
 ```
 cd overall
 bash overall_fastserve_sharegpt.sh
@@ -161,7 +163,7 @@ for (( i=0; i<num_tests; i++ )); do
 ```
 # FastServe-FCFS backend
 conda activate fastserve $$ cd FastServe
-python3 fastserve/api_server/fastserve_api_server.py --host 0.0.0.0 --port 8000 --model /user/lsy/research/weights/Llama3-8b-CunnyGPT-16bit-swifttransformer/ --block-size 16 --gpu-memory-utilization 0.9 --swap-space 32 --sched-policy fcfs --max-batch-size 16 --max-tokens-per-batch 2048 --use-dummy-weights
+python3 fastserve/api_server/fastserve_api_server.py --host 0.0.0.0 --port 8000 --model /users/lsy/research/weights/Llama3-8b-CunnyGPT-16bit-swifttransformer/ --block-size 16 --gpu-memory-utilization 0.9 --swap-space 32 --sched-policy fcfs --max-batch-size 16 --max-tokens-per-batch 2048 --use-dummy-weights
 
 # FastGen-FCFS frontend
 conda activate fastserve $$ cd FastServe
